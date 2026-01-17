@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hand Cricket Game</title>
+    <style>
+      body {
+        background: radial-gradient(circle at top, #1a1a2e, #000);
+        color: white;
+        font-family: Arial;
+        text-align: center;
+      }
+      h1 {
+        background: linear-gradient(90deg, #ff0080, #7928ca);
+        padding: 15px;
+      }
+      .game-box {
+        width: 400px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 0 20px cyan;
+      }
+      button {
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        background: linear-gradient(90deg, #00f2fe, #4facfe);
+        margin: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      button:hover {
+        transform: scale(1.1);
+      }
+      .num {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 18px;
+      }
+      .score {
+        font-size: 20px;
+        margin: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🏏 Hand Cricket Game</h1>
+
+    <div class="game-box">
+      <p id="status">Click Toss to Start</p>
+      <p id="target"></p>
+
+      <div class="score">
+        You: <span id="userScore">0</span> | Computer:
+        <span id="compScore">0</span>
+      </div>
+
+      <div id="controls">
+        <button onclick="toss()">Toss</button>
+      </div>
+
+      <div id="numbers"></div>
+
+      <p id="result" style="font-size: 22px; color: #00ffcc"></p>
+
+      <button onclick="restart()">New Game</button>
+    </div>
+
+    <script>
+      let userScore = 0,
+        compScore = 0;
+      let batting = "";
+      let innings = 1;
+      let target = 0;
+      function toss() {
+        let win = Math.random() < 0.5 ? "You" : "Computer";
+
+        document.getElementById("status").innerText =
+          " You won the toss! Choose Bat or Ball:";
+
+        document.getElementById("controls").innerHTML = `
+    <button onclick="choose('user')">Bat</button>
+    <button onclick="choose('computer')">Ball</button>`;
+      }
+
+      function choose(who) {
+        batting = who;
+        start();
+      }
+
+      function start() {
+        document.getElementById("controls").innerHTML = "";
+
+        if (batting === "user") {
+          document.getElementById("status").innerText =
+            "You chose to BAT first";
+        } else {
+          document.getElementById("status").innerText =
+            "You chose to BOWL first (Computer is Batting)";
+        }
+
+        let btns = "";
+        for (let i = 1; i <= 6; i++) {
+          btns += `<button class="num" onclick="play(${i})">${i}</button>`;
+        }
+        document.getElementById("numbers").innerHTML = btns;
+      }
+
+      function play(userNum) {
+        let compNum = Math.floor(Math.random() * 6) + 1;
+
+        if (batting === "user") {
+          if (userNum === compNum) out();
+          else userScore += userNum;
+        } else {
+          if (userNum === compNum) out();
+          else compScore += compNum;
+        }
+
+        document.getElementById("userScore").innerText = userScore;
+        document.getElementById("compScore").innerText = compScore;
+
+        if (innings === 2 && batting === "computer" && compScore >= target)
+          win("Computer");
+        if (innings === 2 && batting === "user" && userScore >= target)
+          win("You");
+      }
+
+      function out() {
+        if (innings === 1) {
+          innings = 2;
+          if (batting === "user") {
+            target = userScore + 1;
+            batting = "computer";
+          } else {
+            target = compScore + 1;
+            batting = "user";
+          }
+          document.getElementById("target").innerText = "Target: " + target;
+          document.getElementById("status").innerText =
+            "OUT! Second Innings Started";
+        } else {
+          if (userScore > compScore) win("You");
+          else if (compScore > userScore) win("Computer");
+          else document.getElementById("result").innerText = "Match Draw!";
+          document.getElementById("numbers").innerHTML = "";
+        }
+      }
+
+      function win(player) {
+        document.getElementById("result").innerText =
+          player + " Wins the Match!";
+        document.getElementById("numbers").innerHTML = "";
+      }
+
+      function restart() {
+        location.reload();
+      }
+    </script>
+  </body>
+</html>
